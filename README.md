@@ -1,2 +1,3 @@
-# p2pGame
-Multiplayer game using PeerJS
+# micro-meadow
+
+multiplayer game using PeerJS
