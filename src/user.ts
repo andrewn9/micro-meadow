@@ -1,54 +1,51 @@
 // user.js
-import { Peer, PeerOptions } from 'peerjs';
+import { Peer } from 'peerjs';
 
-export let metadata: {[index: string]: unknown};
+export let metadata = new Proxy<{ [index: string]: unknown }>({}, {
+    set(target, name, value, receiver) {
+        if (typeof(name) === "string") {
+            console.log(`Set ${name} to ${value}`);
+            if (user) {
+                let actual: { [index: string]: unknown }|undefined = (user.options as any).metadata;
+                if (!actual) actual = {};
+                actual[name] = value;
+            }
+        }
+
+        saveUserData();
+        return Reflect.set(target, name, value, receiver);
+    },
+});
 
 let user: Peer;
 
-export async function initUser(metadata?: {[index: string]: unknown}) {
-        const raw = sessionStorage.getItem('user');
+export async function initUser() {
+    const raw = sessionStorage.getItem('user');
 
-        if (raw) {
-            const savedUser = JSON.parse(raw);
+    if (raw) {
+        const savedUser = JSON.parse(raw);
+        user = new Peer(savedUser.id);
 
-            metadata = new Proxy<{[index: string]: unknown}>(savedUser.metadata, {
-                set(target, name, value, receiver) {
-                    console.log(`Set ${name} to ${value}`)
-                    return Reflect.set(target, name, value, receiver);
-                },
-            });
-
-            user = new Peer(savedUser.id, {
-                host: "localhost",
-                port: 5173,
-                metadata: savedUser.metadata,
-            } as PeerOptions);
-            console.log(metadata);
-        } else {
-            metadata = new Proxy<{[index: string]: unknown}>({}, {
-                set(target, name, value, receiver) {
-                    console.log(`Set ${name} to ${value}`);
-                    saveUserData();
-                    return Reflect.set(target, name, value, receiver);
-                },
-            });
-
-            user = new Peer();
+        for (const name in savedUser.metadata) {
+            metadata[name] = savedUser[name];
         }
-
-        return new Promise<Peer>((resolve, reject) => {
-            user.on('open', (id) => {
-                console.log('User initialized with ID:', id);
-                saveUserData();
-                resolve(user);
-            });
-
-            user.on('error', (error) => {
-                console.error('Error initializing user:', error);
-                reject(error);
-            });
-        });
+    } else {
+        user = new Peer();
     }
+
+    return new Promise<Peer>((resolve, reject) => {
+        user.on('open', (id) => {
+            console.log('User initialized with ID:', id);
+            saveUserData();
+            resolve(user);
+        });
+
+        user.on('error', (error) => {
+            console.error('Error initializing user:', error);
+            reject(error);
+        });
+    });
+}
 
 function saveUserData() {
     const userData = {
