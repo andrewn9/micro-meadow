@@ -2,6 +2,7 @@
 import { Peer } from 'peerjs';
 
 export let metadata = new Proxy<{ [index: string]: unknown }>({}, {
+
     set(target, name, value, receiver) {
         if (typeof(name) === "string") {
             console.log(`Set ${name} to ${value}`);
