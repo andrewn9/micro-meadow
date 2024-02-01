@@ -1,12 +1,5 @@
 import './style.css';
-import * as Matter from 'matter-js';
-
-// module aliases
-var Engine = Matter.Engine,
-    Render = Matter.Render,
-    Runner = Matter.Runner,
-    Bodies = Matter.Bodies,
-    Composite = Matter.Composite;
+import { Engine, Render, Bodies, Composite} from 'matter-js';
 
 // create an engine
 var engine = Engine.create();
@@ -28,8 +21,22 @@ Composite.add(engine.world, [boxA, boxB, ground]);
 // run the renderer
 Render.run(render);
 
-// create runner
-var runner = Runner.create();
+let time: number|undefined, dt: number, lastdt: number;
 
-// run the engine
-Runner.run(runner, engine);
+
+function loop(t: number) {
+    requestAnimationFrame(loop);
+
+    if (time) {
+        dt = t-time;
+    } else {
+        dt = 1/60;
+        lastdt = dt;
+    }
+    time = t;
+
+    Engine.update(engine, dt, dt/lastdt);
+    lastdt = dt;
+}
+
+requestAnimationFrame(loop);
