@@ -1,5 +1,5 @@
 import './style.css';
-import { Engine, Render, Bodies, Composite} from 'matter-js';
+import { Engine, Render, Bodies, Runner, Composite} from 'matter-js';
 
 // create an engine
 var engine = Engine.create();
@@ -21,21 +21,8 @@ Composite.add(engine.world, [boxA, boxB, ground]);
 // run the renderer
 Render.run(render);
 
-let time: number|undefined;
-let dt: number = 17, lastdt: number = dt;
+const runner = Runner.create({
+    isFixed: true,
+})
 
-
-function loop(t: number) {
-    requestAnimationFrame(loop);
-
-    if (time) {
-        dt = t-time;
-    }
-    dt = Math.min(dt, 100);
-    time = t;
-
-    Engine.update(engine, dt, dt/lastdt);
-    lastdt = dt;
-}
-
-requestAnimationFrame(loop);
+Runner.run(runner, engine);
