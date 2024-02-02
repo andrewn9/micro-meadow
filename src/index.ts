@@ -9,9 +9,14 @@ let usernameInput = document.querySelector("#usernameInput") as HTMLInputElement
 let uuid = document.querySelector("#uuid") as HTMLElement;
 let userform = document.querySelector("#userform") as HTMLFormElement;
 
+let modal = document.querySelector("#modal") as HTMLDialogElement;
+
 userform.addEventListener("submit", (e)=>{
     e.preventDefault();
-    changeUsername();
+    let name = usernameInput.value;
+    metadata.username = name;
+    console.log(`Username changed to: ${name}`);
+    (<HTMLElement> document.getElementById("username")).innerText = `Username: ${metadata.username}`;
 });
 
 window.onload = async function () {
@@ -24,9 +29,6 @@ window.onload = async function () {
     }
 };
 
-function changeUsername() {
-    let name = usernameInput.value;
-    metadata.username = name;
-    console.log(`Username changed to: ${name}`);
-    (<HTMLElement> document.getElementById("username")).innerText = `Username: ${metadata.username}`;
-}
+(document.querySelector("#host") as HTMLButtonElement).addEventListener("click", ()=>{
+    modal.showModal();
+});

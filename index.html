@@ -5,15 +5,17 @@
     <script type="module" src="/src/index.ts" defer></script>
 </head>
 <body>
+    <dialog id="modal">
+        <a href="game.html"><button>Enter Game</button></a>
+    </dialog>
     <div>
-        <p id="uuid"></p>
+        <h1>micro meadow</h1>
         <p id="username"></p>
 
         <form id="userform">
-            <label for="usernameInput">Username: </label>
-            <input type="text" id="usernameInput">
+            <input type="text" id="usernameInput" placeholder="Username">
         </form>
-        <button onclick="hostGame()">Host Game</button>
+        <button id="host">Host Game</button>
 
         <br>
         
@@ -22,6 +24,8 @@
             <input type="text" id="roomInput">
             <button>Join</button>
         </form>
+
+        <span id="uuid" class="small"></span>
     </div> 
 </body>
 </html>
