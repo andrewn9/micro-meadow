@@ -21,7 +21,8 @@ Composite.add(engine.world, [boxA, boxB, ground]);
 // run the renderer
 Render.run(render);
 
-let time: number|undefined, dt: number, lastdt: number;
+let time: number|undefined;
+let dt: number = 17, lastdt: number = dt;
 
 
 function loop(t: number) {
@@ -29,10 +30,8 @@ function loop(t: number) {
 
     if (time) {
         dt = t-time;
-    } else {
-        dt = 1/60;
-        lastdt = dt;
     }
+    dt = Math.min(dt, 100);
     time = t;
 
     Engine.update(engine, dt, dt/lastdt);
