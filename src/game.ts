@@ -1,71 +1,51 @@
-import './style.css';
-import { Engine, Events, Render, Runner, Bodies, Composite, Body, Vector, Pair, Pairs } from 'matter-js';
-import * as Inputs from './inputs'
+import './game.css';
 
-// create an engine
-var engine = Engine.create();
+import * as Inputs from './inputs';
+import { createObject, app } from './base';
 
-// create a renderer
-var render = Render.create({
-    element: document.body,
-    engine: engine,
+import * as PIXI from 'pixi.js';
+import { Box, Edge, Vec2 } from 'planck-js';
+
+createObject({
+    sprite: PIXI.Sprite.from("grass.png"),
+    type: "static",
+    position: new Vec2(0, -10),
+    angle: Math.PI*0.1,
+},{
+    shape: new Edge(Vec2(-50, 0), Vec2(50, 0))
 });
 
-render.options.showCollisions=true;
-render.options.showVelocity=true;
-render.options.showDebug=true;
+for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 5; j++) {
+        createObject({
+            sprite: PIXI.Sprite.from("zombie.png"),
+            type: "dynamic",
+            position: new Vec2(j-2, i+2),
+        },{
+            shape: new Box(1, 1),
+            density: 1.0,
+            friction: 0.4,
+        });
+    }
+}
 
-// create two boxes and a ground
-var boxA = Bodies.rectangle(400, 450, 80, 80, {});
-var boxB = Bodies.rectangle(400, 500, 80, 80, {});
-var ground = Bodies.rectangle(400, 600, 800, 85, { isStatic: true});
-
-// add all of the bodies to the world
-Composite.add(engine.world, [boxA, boxB, ground]);
-
-// run the renderer
-Render.run(render);
-
-const runner = Runner.create({
-    isFixed: true,
+const player = createObject({
+    sprite: PIXI.Sprite.from("player.png"),
+    type: "dynamic",
+    position: new Vec2(0, 6),
+    fixedRotation: true,
+    allowSleep: false
+}, {
+    shape: new Box(1, 1),
+    density: 1.0,
+    friction: 0.5,
 });
 
-Runner.run(runner, engine);
-
-var grounded = false;
-let pairs : Pair[];
-
-Events.on(runner, "beforeTick", () => {
-    // grounded = false;
-    // if (pairs) {
-    //     for (var i = 0; i < pairs.length; i++) {
-    //         var pair = pairs[i];
-    //         if (pair.bodyA === boxA) {
-    //             console.log();
-    //             if (Math.atan2(pair.collision.normal.y, pair.collision.normal.x) <= -3/2) {
-    //                 grounded = true;
-    //             }
-    //         }
-    //     }
-    //     pairs = [];
-    // }
-
-    // let speed = (grounded)?0.01:0.01;
-    // if (grounded) {
-    //     if (Inputs.getKeyPressed(' ')) {
-    //         Body.applyForce(boxA, boxA.position, Vector.create(0,-0.25));
-    //     }
-    // }
-    // if (Inputs.getKeyDown('ArrowLeft')) {
-    //     Body.applyForce(boxA, boxA.position, Vector.create(-speed, 0));
-    // }
-    // if (Inputs.getKeyDown('ArrowRight')) {
-    //     Body.applyForce(boxA, boxA.position, Vector.create(speed,0));
-    // }
-    
-    // console.log(grounded);
-});
-
-Events.on(engine, "collisionActive", function (event) {
-    pairs = event.pairs;
-});
+app.ticker.add(() => {
+    if (Inputs.getKeyDown("A")) {
+        player.applyForceToCenter(new Vec2(-100, 0));
+    }
+    if (Inputs.getKeyDown("D")) {
+        player.applyForceToCenter(new Vec2(100, 0));
+    }
+})
