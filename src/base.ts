@@ -1,4 +1,4 @@
-import { Vec2, World, BodyDef, FixtureDef, Body } from 'planck-js';
+import { Vec2, World, BodyDef, FixtureDef, Body } from 'planck';
 import * as PIXI from 'pixi.js';
 
 // function assert(condition: any, msg?: string): asserts condition {

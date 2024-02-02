@@ -4,7 +4,7 @@ import * as Inputs from './inputs';
 import { createObject, app } from './base';
 
 import * as PIXI from 'pixi.js';
-import { Box, Edge, Vec2 } from 'planck-js';
+import { Box, Edge, Vec2 } from 'planck';
 
 createObject({
     sprite: PIXI.Sprite.from("grass.png"),
