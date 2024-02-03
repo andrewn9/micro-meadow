@@ -1,4 +1,5 @@
 import { Vec2, World, BodyDef, FixtureDef, Body } from 'planck';
+import { Renderer } from './renderer';
 import * as PIXI from 'pixi.js';
 
 // function assert(condition: any, msg?: string): asserts condition {
@@ -7,29 +8,17 @@ import * as PIXI from 'pixi.js';
 //     }
 // }
 
-export const app = new PIXI.Application({ antialias: true, resizeTo: window });
-document.body.appendChild(app.view as HTMLCanvasElement);
+export const renderer = new Renderer(document.getElementById("viewport") as HTMLElement);
+export const app = renderer.app;
 
-const world = new World({
-    gravity: Vec2(0, -1),
+export const world = new World({
+    gravity: Vec2(0, -10),
     allowSleep: true,
 });
 
-// pixels per meter
-let scale = 20;
-
-const stage = new PIXI.Container();
-app.stage.addChild(stage);
-
-stage.position.x = app.screen.width/2;
-stage.position.y = app.screen.height/2;
-// stage.pivot.x = stage.width/2;
-// stage.pivot.y = stage.height/2;
-
-const tracker: Map<Body, PIXI.Sprite> = new Map();
-
-interface EntityDef extends BodyDef {
+export interface EntityDef extends BodyDef {
     sprite?: PIXI.Sprite,
+    visible?: Boolean
 }
 
 export function createObject(def: EntityDef, fixture?: FixtureDef) {
@@ -39,26 +28,25 @@ export function createObject(def: EntityDef, fixture?: FixtureDef) {
         body.createFixture(fixture);
     }
 
-    if (def.sprite) {
-        const sprite = def.sprite;
-        tracker.set(body, sprite);
-        sprite.anchor.set(0.5);
-
-        stage.addChild(sprite);
+    if (def.visible) {
+        def.sprite?.anchor.set(0.5);
+        renderer.add(body, def);
     }
 
     return body;
 }
 
-setInterval(()=>{
-    world.step(1/60);
-}, 1/60);
+// setInterval(()=> {
+//     world.step(1 / 60);
+// }, 1 / 60);
 
-app.ticker.add((dt) => {
-    dt /= 30;
-    tracker.forEach((sprite, body) => {
-        sprite.x = body.getPosition().x * scale;
-        sprite.y = -body.getPosition().y * scale;
-        sprite.rotation = -body.getAngle();
-    });
-});
+var lastTime = performance.now();
+function gameLoop(currentTime: number) {
+    var deltaTime = (currentTime - lastTime) / 1000;
+    world.step(deltaTime);
+    lastTime = currentTime;
+    requestAnimationFrame(gameLoop);
+}
+requestAnimationFrame(gameLoop);
+
+renderer.start(world);
