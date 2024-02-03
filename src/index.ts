@@ -5,6 +5,9 @@ import './style.css'
 
 let user: Peer;
 
+// pause testing
+window.location.href = "game.html";
+
 let usernameInput = document.querySelector("#usernameInput") as HTMLInputElement;
 let uuid = document.querySelector("#uuid") as HTMLElement;
 let userform = document.querySelector("#userform") as HTMLFormElement;
