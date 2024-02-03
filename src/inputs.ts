@@ -4,9 +4,6 @@ window.addEventListener("keydown", (e)=>{
     if (!e.repeat) {
         const key = e.key.toLowerCase();
         keys[key] = true;
-        // setTimeout(() => {
-        //     if (keys[key]) keys[key] = false;
-        // }, 16.7);
     }
 });
 window.addEventListener("keyup", (e)=>{
@@ -22,9 +19,18 @@ export function getKeyDown(key: string): boolean {
 }
 
 /**
- * Returns true if a key is pressed for 1 frame (~16.7 ms).
+ * Returns true if a key is pressed for 1 frame.
  * @param key Key to check.
  */
-// export function getKeyPressed(key: string): boolean {
-//     return keys[key.toLowerCase()] === true;
-// }
+export function getKeyPressed(key: string): boolean {
+    return keys[key.toLowerCase()] === true;
+}
+
+/**
+ * Call at the end of a frame. Necesarry for getKeyPressed
+ */
+export function reset() {
+    for (const key in keys) {
+        keys[key] = false;
+    }
+}

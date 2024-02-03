@@ -1,52 +1,110 @@
 import { Vec2, World, BodyDef, FixtureDef, Body } from 'planck';
-import { Renderer } from './renderer';
 import * as PIXI from 'pixi.js';
 
-// function assert(condition: any, msg?: string): asserts condition {
-//     if (!condition) {
-//         throw new Error(msg);
-//     }
-// }
+import { reset } from './inputs';
 
-export const renderer = new Renderer(document.getElementById("viewport") as HTMLElement);
-export const app = renderer.app;
-
-export const world = new World({
-    gravity: Vec2(0, -10),
-    allowSleep: true,
+const world = new World({
+    gravity: new Vec2(0, -10),
 });
 
-export interface EntityDef extends BodyDef {
-    sprite?: PIXI.Sprite,
-    visible?: Boolean
+const app = new PIXI.Application({ antialias: true, backgroundColor: "#888" });
+document.body.appendChild(app.view as HTMLCanvasElement);
+
+interface EntityDef extends BodyDef {
+    sprite?: PIXI.Sprite | PIXI.Sprite[],
 }
 
-export function createObject(def: EntityDef, fixture?: FixtureDef) {
-    const body = world.createBody(def);
+const tracker: Body[] = [];
 
+const camera = {
+    zoom: 20,
+    x: -app.screen.width/2,
+    y: -app.screen.height/2,
+}
+
+const connections: {[index: string]: (()=>any)[]} = {};
+
+export function createObject(def: EntityDef, fixture?: FixtureDef): Body {
+    const body = world.createBody(def);
+    
+    if (def.sprite) {
+        tracker.push(body);
+        body.setUserData(def.sprite);
+    }
     if (fixture) {
         body.createFixture(fixture);
-    }
-
-    if (def.visible) {
-        def.sprite?.anchor.set(0.5);
-        renderer.add(body, def);
     }
 
     return body;
 }
 
-// setInterval(()=> {
-//     world.step(1 / 60);
-// }, 1 / 60);
+export function createSprite(source: PIXI.SpriteSource, width?: number, height?: number): PIXI.Sprite {
+    const sprite = PIXI.Sprite.from(source);
+    if (width) sprite.width = width;
+    if (height) sprite.height = height;
 
-var lastTime = performance.now();
-function gameLoop(currentTime: number) {
-    var deltaTime = (currentTime - lastTime) / 1000;
-    world.step(deltaTime);
-    lastTime = currentTime;
-    requestAnimationFrame(gameLoop);
+    sprite.anchor.set(0.5, 0.5);
+    app.stage.addChild(sprite);
+
+    return sprite;
 }
-requestAnimationFrame(gameLoop);
 
-renderer.start(world);
+export function connect(event: string, callback: ()=>any) {
+    if (!connections[event]) connections[event] = [];
+    connections[event].push(callback);
+}
+
+export function disconnect(event: string, callback: ()=>any) {
+    if (!connections[event]) return;
+    const index = connections[event].indexOf(callback);
+    if (index != -1) {
+        connections[event].splice(index, 1);
+    }
+}
+
+function fire(event: string) {
+    for (let i = 0; i < connections[event].length; i++) {
+        connections[event][i]();
+    }
+}
+
+let acc = performance.now();
+function physics() {
+    requestAnimationFrame(physics);
+    if (performance.now()-acc > 0.016) {
+        fire("before");
+        world.step(0.016);
+        acc += 0.016;
+    }
+    reset();
+}
+
+requestAnimationFrame(physics);
+
+function update() {
+    for (let i = 0; i < tracker.length; i++) {
+        const body = tracker[i];
+        if ((body.getUserData() as any).constructor === Array) {
+            const sprites = (body.getUserData() as PIXI.Sprite[]);
+            for (let i = 0; i < sprites.length; i++) {
+                const sprite = sprites[i];
+        
+                const pos = body.getPosition();
+                sprite.x = pos.x * camera.zoom - camera.x;
+                sprite.y = -pos.y * camera.zoom - camera.y;
+        
+                sprite.rotation = -body.getAngle();
+            }
+        } else {
+            const sprite = body.getUserData() as PIXI.Sprite;
+    
+            const pos = body.getPosition();
+            sprite.x = pos.x * camera.zoom - camera.x;
+            sprite.y = -pos.y * camera.zoom - camera.y;
+    
+            sprite.rotation = -body.getAngle();
+        }
+    }
+}
+
+app.ticker.add(update);

@@ -4,7 +4,7 @@ import { EntityDef } from './base';
 import { Application, Container } from 'pixi.js';
 import { World, Body } from 'planck';
 
-const pixelsPerM = 32;
+const pixelsPerM = 14;
 
 type Callbacks = {
     preRender: (() => void)[];
