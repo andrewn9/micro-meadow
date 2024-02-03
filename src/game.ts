@@ -1,67 +1,52 @@
 import './game.css';
 
 import * as Inputs from './inputs';
-import { world, createObject, renderer } from './base';
+import { createObject, createSprite, connect } from './base'
 
-import * as PIXI from 'pixi.js';
 import { Box, Edge, Vec2 } from 'planck';
 
 createObject({
-    sprite: PIXI.Sprite.from("grass.png"),
     type: "static",
-    position: new Vec2(0, 0),
-    angle: Math.PI*0.1,
-    visible: true
+    sprite: createSprite("player.png", 600, 60),
+    position: new Vec2(0, -5),
 },{
-    shape: new Edge(Vec2(-5, 0), Vec2(5, 0))
+    shape: new Box(15, 1.5),
 });
 
-for (let i = 0; i < 3; i++) {
+for (let i = 0; i < 5; i++) {
     for (let j = 0; j < 5; j++) {
         createObject({
-            sprite: PIXI.Sprite.from("zombie.png"),
             type: "dynamic",
-            position: new Vec2(j-2, i+2),
-            visible: true,
+            sprite: createSprite("player.png", 40, 40),
+            position: new Vec2(i-2, j+3),
         },{
             shape: new Box(1, 1),
-            density: 1.0,
-            friction: 0.4,
+            density: 2,
         });
     }
 }
 
 const player = createObject({
-    sprite: PIXI.Sprite.from("player.png"),
     type: "dynamic",
-    position: new Vec2(0, 6),
-    fixedRotation: true,
-    allowSleep: false,
-    visible: true,
-}, {
-    shape: new Box(1, 1),
-    density: 1.0,
-    friction: 0.5,
-});
-
-createObject({
-    sprite: PIXI.Sprite.from("rock.png"),
-    type: "static",
-    position: new Vec2(0, 0),
-    angle: Math.PI*0.1,
-    visible: true
+    sprite: createSprite("player.png", 40, 40),
+    position: new Vec2(0, 10),
 },{
-    shape: new Edge(Vec2(-5, 0), Vec2(5, 0))
+    shape: new Box(1, 1),
+    density: 10,
+    friction: 0.7
 });
 
-world.on('pre-solve', () => {
-    if (Inputs.getKeyDown("W")) {
-        player.applyForce(new Vec2(0, 5), player.getWorldCenter());
+connect("before", ()=>{
+    const pos = player.getWorldCenter();
+    let dx = 0;
+    if (Inputs.getKeyDown("d")) dx++;
+    if (Inputs.getKeyDown("a")) dx--;
+
+    if (dx !== 0) {
+        player.applyLinearImpulse(new Vec2(dx*5, 0), pos);
     }
-    if (Inputs.getKeyDown("A")) {
-        player.applyForce(new Vec2(-5, 0), player.getWorldCenter());
+
+    if (Inputs.getKeyPressed(" ")) {
+        player.applyLinearImpulse(new Vec2(0, 350), pos);
     }
-    if (Inputs.getKeyDown("D")) {
-        player.applyForce(new Vec2(5, 0), player.getWorldCenter());
-    }}
-)
+});
