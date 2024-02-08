@@ -19,6 +19,15 @@ createObject({
     shape: new Box(15, 1.5),
 });
 
+createObject({
+    type: "static",
+    sprite: createSprite("player.png", 600, 60),
+    position: new Vec2(5, -5),
+    angle: Math.PI/6,
+},{
+    shape: new Box(15, 1.5),
+});
+
 for (let i = 0; i < 5; i++) {
     for (let j = 0; j < 5; j++) {
         createObject({
@@ -73,6 +82,7 @@ connect("before", ()=>{
     }
 
     if (Inputs.getKeyPressed(" ") && grounded) {
+        console.log("YIPEE");
         player.applyLinearImpulse(new Vec2(0, 350), pos);
     }
 

@@ -68,15 +68,16 @@ function fire(event: string) {
     }
 }
 
+const fixedTimeStep = 0.016;
 let acc = performance.now();
 function physics() {
     requestAnimationFrame(physics);
-    while (performance.now()-acc > 17) {
+    while (performance.now()-acc > fixedTimeStep*1000) {
         fire("before");
-        world.step(0.016);
-        acc += 17;
+        reset();
+        world.step(fixedTimeStep);
+        acc += fixedTimeStep*1000;
     }
-    reset();
 }
 
 requestAnimationFrame(physics);
