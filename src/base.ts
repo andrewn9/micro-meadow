@@ -71,10 +71,10 @@ function fire(event: string) {
 let acc = performance.now();
 function physics() {
     requestAnimationFrame(physics);
-    if (performance.now()-acc > 0.016) {
+    while (performance.now()-acc > 17) {
         fire("before");
         world.step(0.016);
-        acc += 0.016;
+        acc += 17;
     }
     reset();
 }
