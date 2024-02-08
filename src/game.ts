@@ -36,6 +36,7 @@ const player = createObject({
     type: "dynamic",
     sprite: createSprite("player.png", 40, 40),
     position: new Vec2(0, 10),
+    allowSleep: false,
 },{
     shape: new Box(1, 1),
     density: 10,
@@ -81,10 +82,6 @@ connect("before", ()=>{
 
 world.on("pre-solve", (contact) => {
     contacts.push(contact);
-    let worldManifold = contact.getWorldManifold(null);
 
-    if (worldManifold) {
-        
-    }
     // console.log(worldManifold?.normal);
 });
