@@ -3,7 +3,7 @@ import * as PIXI from 'pixi.js';
 
 import { reset } from './inputs';
 
-const world = new World({
+export const world = new World({
     gravity: new Vec2(0, -10),
 });
 
@@ -16,10 +16,10 @@ interface EntityDef extends BodyDef {
 
 const tracker: Body[] = [];
 
-const camera = {
+export const camera = {
     zoom: 20,
-    x: -app.screen.width/2,
-    y: -app.screen.height/2,
+    x: 0,
+    y: 0,
 }
 
 const connections: {[index: string]: (()=>any)[]} = {};
@@ -99,8 +99,8 @@ function update() {
             const sprite = body.getUserData() as PIXI.Sprite;
     
             const pos = body.getPosition();
-            sprite.x = pos.x * camera.zoom - camera.x;
-            sprite.y = -pos.y * camera.zoom - camera.y;
+            sprite.x = (pos.x - camera.x) * camera.zoom + app.screen.width/2;
+            sprite.y = (pos.y - camera.y) * -camera.zoom + app.screen.height/2;
     
             sprite.rotation = -body.getAngle();
         }
