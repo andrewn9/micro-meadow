@@ -23,35 +23,46 @@ createObject({
 createObject({
     type: "static",
     sprite: createSprite("player.png", 600, 60),
-    position: new Vec2(15, -5),
+    position: new Vec2(27, 2.5),
     angle: Math.PI/6,
 },{
     shape: new Box(15, 1.5),
     friction: 0.5,
 });
 
-for (let i = 0; i < 5; i++) {
-    for (let j = 0; j < 5; j++) {
-        createObject({
-            type: "dynamic",
-            sprite: createSprite("player.png", 40, 40),
-            position: new Vec2(i-2, j+3),
-        },{
-            shape: new Box(1, 1),
-            density: 2,
-        });
-    }
-}
+createObject({
+    type: "dynamic",
+    sprite: createSprite("player.png", 40, 40),
+    position: new Vec2(0, 11),
+},{
+    shape: new Box(1, 1),
+    density: 2,
+    friction: 0.5,
+});
+
+// for (let i = 0; i < 5; i++) {
+//     for (let j = 0; j < 5; j++) {
+//         createObject({
+//             type: "dynamic",
+//             sprite: createSprite("player.png", 40, 40),
+//             position: new Vec2(i-2, j+3),
+//         },{
+//             shape: new Box(1, 1),
+//             density: 2,
+//         });
+//     }
+// }
 
 const player = createObject({
     type: "dynamic",
     sprite: createSprite("player.png", 40, 40),
     position: new Vec2(0, 10),
     allowSleep: false,
+    // fixedRotation: true,
 },{
     shape: new Box(1, 1),
     density: 10,
-    friction: 0.5,
+    friction: 1.5,
 });
 
 const contacts: Contact[] = [];
@@ -79,7 +90,7 @@ connect("before", ()=>{
     if (Inputs.getKeyDown("d")) dx++;
     if (Inputs.getKeyDown("a")) dx--;
 
-    let speed = 10;
+    let speed = 15;
 
     if (dx !== 0) {
         if (player.getLinearVelocity().x*dx > 0) {
@@ -88,6 +99,7 @@ connect("before", ()=>{
         }
         if (grounded) {
             player.applyLinearImpulse(new Vec2(dx*grounded.y*speed, -grounded.x*speed), pos);
+            // player.applyLinearImpulse(new Vec2(dx*speed, 0), pos);
         } else {
             speed *= 0.5
             player.applyLinearImpulse(new Vec2(dx*speed, 0), pos);
@@ -95,7 +107,6 @@ connect("before", ()=>{
     }
 
     if (Inputs.getKeyPressed(" ") && grounded) {
-        console.log("YIPEE");
         player.applyLinearImpulse(new Vec2(0, 350), pos);
     }
 
