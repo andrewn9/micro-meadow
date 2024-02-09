@@ -17,15 +17,17 @@ createObject({
     position: new Vec2(0, -5),
 },{
     shape: new Box(15, 1.5),
+    friction: 0.5,
 });
 
 createObject({
     type: "static",
     sprite: createSprite("player.png", 600, 60),
-    position: new Vec2(5, -5),
+    position: new Vec2(15, -5),
     angle: Math.PI/6,
 },{
     shape: new Box(15, 1.5),
+    friction: 0.5,
 });
 
 for (let i = 0; i < 5; i++) {
@@ -49,13 +51,13 @@ const player = createObject({
 },{
     shape: new Box(1, 1),
     density: 10,
-    friction: 0.7
+    friction: 0.5,
 });
 
 const contacts: Contact[] = [];
 
 connect("before", ()=>{
-    let grounded = false;
+    let grounded = null;
     for (let i = 0; i < contacts.length; i++) {
         const contact = contacts.pop();
         assert(contact);
@@ -67,7 +69,7 @@ connect("before", ()=>{
 
         const manifold = contact.getWorldManifold(null);
         if (manifold && Math.acos(manifold.normal.y) < Math.PI/4) {
-            grounded = true;
+            grounded = manifold.normal;
             break;
         }
     }
@@ -77,8 +79,19 @@ connect("before", ()=>{
     if (Inputs.getKeyDown("d")) dx++;
     if (Inputs.getKeyDown("a")) dx--;
 
+    let speed = 10;
+
     if (dx !== 0) {
-        player.applyLinearImpulse(new Vec2(dx*5, 0), pos);
+        if (player.getLinearVelocity().x*dx > 0) {
+            const damping = Math.sqrt(1-player.getLinearVelocity().x*dx*0.125) || 0;
+            speed *= damping;
+        }
+        if (grounded) {
+            player.applyLinearImpulse(new Vec2(dx*grounded.y*speed, -grounded.x*speed), pos);
+        } else {
+            speed *= 0.5
+            player.applyLinearImpulse(new Vec2(dx*speed, 0), pos);
+        }
     }
 
     if (Inputs.getKeyPressed(" ") && grounded) {
