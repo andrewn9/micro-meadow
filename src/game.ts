@@ -3,7 +3,7 @@ import './game.css';
 import * as Inputs from './inputs';
 import { createObject, createSprite, connect, camera, world } from './base'
 
-import { Box, Contact, Vec2 } from 'planck';
+import { Box, Contact, Manifold, Vec2 } from 'planck';
 
 function assert(condition: any, msg?: string): asserts condition {
     if (!condition) {
@@ -27,6 +27,15 @@ createObject({
     angle: Math.PI/6,
 },{
     shape: new Box(15, 1.5),
+    friction: 0.5,
+});
+
+createObject({
+    type: "static",
+    sprite: createSprite("player.png", 200, 400),
+    position: new Vec2(-15, 2.5),
+},{
+    shape: new Box(5, 10),
     friction: 0.5,
 });
 
@@ -90,7 +99,7 @@ connect("before", ()=>{
     if (Inputs.getKeyDown("d")) dx++;
     if (Inputs.getKeyDown("a")) dx--;
 
-    let speed = 15;
+    let speed = 30;
 
     if (dx !== 0) {
         if (player.getLinearVelocity().x*dx > 0) {
@@ -107,7 +116,7 @@ connect("before", ()=>{
     }
 
     if (Inputs.getKeyPressed(" ") && grounded) {
-        player.applyLinearImpulse(new Vec2(0, 350), pos);
+        player.applyLinearImpulse(new Vec2(0, 500), pos);
     }
 
     camera.x += (pos.x-camera.x) * 0.1;
@@ -116,6 +125,20 @@ connect("before", ()=>{
 
 world.on("pre-solve", (contact) => {
     contacts.push(contact);
+
+    const fixtureA = contact.getFixtureA();
+    const fixtureB = contact.getFixtureB();
+    if (!fixtureA && !fixtureB) return;
+    if (fixtureA.getBody() !== player && fixtureB.getBody() !== player) return;
+
+    const manifold = contact.getWorldManifold(null);
+
+    assert(manifold);
+    const y = manifold.normal.y;
+    const friction = 1-Math.sqrt(1-9*y*y);
+    if (!Number.isNaN(friction)) {
+        contact.setFriction(friction);
+    }
 
     // console.log(worldManifold?.normal);
 });

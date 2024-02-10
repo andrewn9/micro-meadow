@@ -4,7 +4,7 @@ import * as PIXI from 'pixi.js';
 import { reset } from './inputs';
 
 export const world = new World({
-    gravity: new Vec2(0, -10),
+    gravity: new Vec2(0, -26),
 });
 
 const app = new PIXI.Application({ antialias: true, backgroundColor: "#888" });
