@@ -24,6 +24,12 @@ export const camera = {
 
 const connections: {[index: string]: (()=>any)[]} = {};
 
+/**
+ * Creates new game object
+ * @param def Entity definition
+ * @param fixture Fixture definition
+ * @returns PlanckJs body
+ */
 export function createObject(def: EntityDef, fixture?: FixtureDef): Body {
     const body = world.createBody(def);
     
@@ -38,6 +44,13 @@ export function createObject(def: EntityDef, fixture?: FixtureDef): Body {
     return body;
 }
 
+/**
+ * 
+ * @param source Any sprite source, usually path to image
+ * @param width Resizes image width in pixels
+ * @param height Resizes image height in pixels
+ * @returns A PIXI sprite
+ */
 export function createSprite(source: PIXI.SpriteSource, width?: number, height?: number): PIXI.Sprite {
     const sprite = PIXI.Sprite.from(source);
     if (width) sprite.width = width;
@@ -49,11 +62,21 @@ export function createSprite(source: PIXI.SpriteSource, width?: number, height?:
     return sprite;
 }
 
+/**
+ * Attach a callback to an event
+ * @param event Event name
+ * @param callback 
+ */
 export function connect(event: string, callback: ()=>any) {
     if (!connections[event]) connections[event] = [];
     connections[event].push(callback);
 }
 
+/**
+ * Remove a callback from an event
+ * @param event Event name
+ * @param callback 
+ */
 export function disconnect(event: string, callback: ()=>any) {
     if (!connections[event]) return;
     const index = connections[event].indexOf(callback);

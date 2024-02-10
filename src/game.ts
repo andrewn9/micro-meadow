@@ -3,7 +3,7 @@ import './game.css';
 import * as Inputs from './inputs';
 import { createObject, createSprite, connect, camera, world } from './base'
 
-import { Box, Contact, Manifold, Vec2 } from 'planck';
+import { Box, Contact, Vec2 } from 'planck';
 
 function assert(condition: any, msg?: string): asserts condition {
     if (!condition) {
@@ -11,6 +11,7 @@ function assert(condition: any, msg?: string): asserts condition {
     }
 }
 
+// Create world objects
 createObject({
     type: "static",
     sprite: createSprite("player.png", 600, 60),
@@ -74,26 +75,33 @@ const player = createObject({
     friction: 1.5,
 });
 
+// Store all world contacts
 const contacts: Contact[] = [];
 
+// Pre-physics sim loop
 connect("before", ()=>{
     let grounded = null;
+
+    // Iterate through contacts
     for (let i = 0; i < contacts.length; i++) {
         const contact = contacts.pop();
         assert(contact);
 
+        // Check if the contact is associated with the player
         const fixtureA = contact.getFixtureA();
         const fixtureB = contact.getFixtureB();
         if (!fixtureA && !fixtureB) continue;
         if (fixtureA.getBody() !== player && fixtureB.getBody() !== player) continue;
 
+        // Check if the slope is less than 45 degrees
         const manifold = contact.getWorldManifold(null);
-        if (manifold && Math.acos(manifold.normal.y) < Math.PI/4) {
+        if (manifold && Math.acos(manifold.normal.y) < Math.PI*0.25) {
             grounded = manifold.normal;
             break;
         }
     }
 
+    // Get input x-axis
     const pos = player.getWorldCenter();
     let dx = 0;
     if (Inputs.getKeyDown("d")) dx++;
@@ -103,12 +111,13 @@ connect("before", ()=>{
 
     if (dx !== 0) {
         if (player.getLinearVelocity().x*dx > 0) {
+            // Limit player speed
             const damping = Math.sqrt(1-player.getLinearVelocity().x*dx*0.125) || 0;
             speed *= damping;
         }
         if (grounded) {
+            // Apply force perpindicular to ground normal
             player.applyLinearImpulse(new Vec2(dx*grounded.y*speed, -grounded.x*speed), pos);
-            // player.applyLinearImpulse(new Vec2(dx*speed, 0), pos);
         } else {
             speed *= 0.5
             player.applyLinearImpulse(new Vec2(dx*speed, 0), pos);
@@ -119,6 +128,7 @@ connect("before", ()=>{
         player.applyLinearImpulse(new Vec2(0, 500), pos);
     }
 
+    // Smooth camera follow
     camera.x += (pos.x-camera.x) * 0.1;
     camera.y += (pos.y-camera.y) * 0.1;
 });
@@ -126,6 +136,7 @@ connect("before", ()=>{
 world.on("pre-solve", (contact) => {
     contacts.push(contact);
 
+    // Check if contact is associated with the player
     const fixtureA = contact.getFixtureA();
     const fixtureB = contact.getFixtureB();
     if (!fixtureA && !fixtureB) return;
@@ -134,11 +145,11 @@ world.on("pre-solve", (contact) => {
     const manifold = contact.getWorldManifold(null);
 
     assert(manifold);
+
+    // Prevent player clinging to vertical walls
     const y = manifold.normal.y;
     const friction = 1-Math.sqrt(1-9*y*y);
     if (!Number.isNaN(friction)) {
-        contact.setFriction(friction);
+        contact.setFriction(friction*fixtureA.getFriction()*fixtureB.getFriction());
     }
-
-    // console.log(worldManifold?.normal);
 });
