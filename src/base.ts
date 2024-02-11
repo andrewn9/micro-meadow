@@ -11,8 +11,16 @@ const app = new PIXI.Application({ antialias: true, backgroundColor: "#888" });
 document.body.appendChild(app.view as HTMLCanvasElement);
 
 interface EntityDef extends BodyDef {
-    sprite?: PIXI.Sprite | PIXI.Sprite[],
+    sprite?: SpriteDef,
 }
+
+interface SpriteDef {
+    source: PIXI.SpriteSource,
+    width?: number,
+    height?: number,
+}
+
+export const map: [EntityDef, FixtureDef | undefined][] = [];
 
 const tracker: Body[] = [];
 
@@ -34,12 +42,20 @@ export function createObject(def: EntityDef, fixture?: FixtureDef): Body {
     const body = world.createBody(def);
     
     if (def.sprite) {
+        const sprite = PIXI.Sprite.from(def.sprite.source);
+        if (def.sprite.width) sprite.width = def.sprite.width;
+        if (def.sprite.height) sprite.height = def.sprite.height;
+    
+        sprite.anchor.set(0.5, 0.5);
+        app.stage.addChild(sprite);
+
         tracker.push(body);
-        body.setUserData(def.sprite);
+        body.setUserData(sprite);
     }
     if (fixture) {
         body.createFixture(fixture);
     }
+    map.push([def, fixture]);
 
     return body;
 }
@@ -95,6 +111,7 @@ const fixedTimeStep = 0.016;
 let acc = performance.now();
 function physics() {
     requestAnimationFrame(physics);
+    if (performance.now()-acc > 100) acc = performance.now() - 100;
     while (performance.now()-acc > fixedTimeStep*1000) {
         fire("before");
         reset();

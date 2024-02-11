@@ -1,7 +1,7 @@
 import './game.css';
 
 import * as Inputs from './inputs';
-import { createObject, createSprite, connect, camera, world } from './base'
+import { createObject, connect, camera, world, map } from './base'
 
 import { Box, Contact, Vec2 } from 'planck';
 
@@ -14,7 +14,11 @@ function assert(condition: any, msg?: string): asserts condition {
 // Create world objects
 createObject({
     type: "static",
-    sprite: createSprite("player.png", 600, 60),
+    sprite: {
+        source: "player.png", 
+        width: 600, 
+        height: 60
+    },
     position: new Vec2(0, -5),
 },{
     shape: new Box(15, 1.5),
@@ -23,7 +27,11 @@ createObject({
 
 createObject({
     type: "static",
-    sprite: createSprite("player.png", 600, 60),
+    sprite: {
+        source: "player.png", 
+        width: 600, 
+        height: 60
+    },
     position: new Vec2(27, 2.5),
     angle: Math.PI/6,
 },{
@@ -33,7 +41,11 @@ createObject({
 
 createObject({
     type: "static",
-    sprite: createSprite("player.png", 200, 400),
+    sprite: {
+        source: "player.png", 
+        width: 200, 
+        height: 400
+    },
     position: new Vec2(-15, 2.5),
 },{
     shape: new Box(5, 10),
@@ -42,7 +54,11 @@ createObject({
 
 createObject({
     type: "dynamic",
-    sprite: createSprite("player.png", 40, 40),
+    sprite: {
+        source: "player.png", 
+        width: 40, 
+        height: 40
+    },
     position: new Vec2(0, 11),
 },{
     shape: new Box(1, 1),
@@ -65,7 +81,11 @@ createObject({
 
 const player = createObject({
     type: "dynamic",
-    sprite: createSprite("player.png", 40, 40),
+    sprite: {
+        source: "player.png", 
+        width: 40, 
+        height: 40
+    },
     position: new Vec2(0, 10),
     allowSleep: false,
     // fixedRotation: true,
@@ -112,14 +132,14 @@ connect("before", ()=>{
     if (dx !== 0) {
         if (player.getLinearVelocity().x*dx > 0) {
             // Limit player speed
-            const damping = Math.sqrt(1-player.getLinearVelocity().x*dx*0.125) || 0;
+            const damping = Math.sqrt(1-player.getLinearVelocity().x*dx*0.1) || 0;
             speed *= damping;
         }
         if (grounded) {
             // Apply force perpindicular to ground normal
             player.applyLinearImpulse(new Vec2(dx*grounded.y*speed, -grounded.x*speed), pos);
         } else {
-            speed *= 0.5
+            speed *= 0.2;
             player.applyLinearImpulse(new Vec2(dx*speed, 0), pos);
         }
     }
@@ -152,4 +172,13 @@ world.on("pre-solve", (contact) => {
     if (!Number.isNaN(friction)) {
         contact.setFriction(friction*fixtureA.getFriction()*fixtureB.getFriction());
     }
+});
+
+console.log(JSON.stringify(map));
+
+(document.querySelector("#exp") as HTMLButtonElement).addEventListener("click", ()=> {
+    const link = document.createElement("a");
+    link.href = `data:text/,${JSON.stringify(map)}`;
+    link.download = "map.json";
+    link.click();
 });
