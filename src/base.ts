@@ -4,15 +4,23 @@ import * as PIXI from 'pixi.js';
 import { reset } from './inputs';
 
 export const world = new World({
-    gravity: new Vec2(0, -10),
+    gravity: new Vec2(0, -26),
 });
 
 const app = new PIXI.Application({ antialias: true, backgroundColor: "#888" });
 document.body.appendChild(app.view as HTMLCanvasElement);
 
 interface EntityDef extends BodyDef {
-    sprite?: PIXI.Sprite | PIXI.Sprite[],
+    sprite?: SpriteDef,
 }
+
+interface SpriteDef {
+    source: PIXI.SpriteSource,
+    width?: number,
+    height?: number,
+}
+
+export const map: [EntityDef, FixtureDef | undefined][] = [];
 
 const tracker: Body[] = [];
 
@@ -24,20 +32,41 @@ export const camera = {
 
 const connections: {[index: string]: (()=>any)[]} = {};
 
+/**
+ * Creates new game object
+ * @param def Entity definition
+ * @param fixture Fixture definition
+ * @returns PlanckJs body
+ */
 export function createObject(def: EntityDef, fixture?: FixtureDef): Body {
     const body = world.createBody(def);
     
     if (def.sprite) {
+        const sprite = PIXI.Sprite.from(def.sprite.source);
+        if (def.sprite.width) sprite.width = def.sprite.width;
+        if (def.sprite.height) sprite.height = def.sprite.height;
+    
+        sprite.anchor.set(0.5, 0.5);
+        app.stage.addChild(sprite);
+
         tracker.push(body);
-        body.setUserData(def.sprite);
+        body.setUserData(sprite);
     }
     if (fixture) {
         body.createFixture(fixture);
     }
+    map.push([def, fixture]);
 
     return body;
 }
 
+/**
+ * 
+ * @param source Any sprite source, usually path to image
+ * @param width Resizes image width in pixels
+ * @param height Resizes image height in pixels
+ * @returns A PIXI sprite
+ */
 export function createSprite(source: PIXI.SpriteSource, width?: number, height?: number): PIXI.Sprite {
     const sprite = PIXI.Sprite.from(source);
     if (width) sprite.width = width;
@@ -49,11 +78,21 @@ export function createSprite(source: PIXI.SpriteSource, width?: number, height?:
     return sprite;
 }
 
+/**
+ * Attach a callback to an event
+ * @param event Event name
+ * @param callback 
+ */
 export function connect(event: string, callback: ()=>any) {
     if (!connections[event]) connections[event] = [];
     connections[event].push(callback);
 }
 
+/**
+ * Remove a callback from an event
+ * @param event Event name
+ * @param callback 
+ */
 export function disconnect(event: string, callback: ()=>any) {
     if (!connections[event]) return;
     const index = connections[event].indexOf(callback);
@@ -68,15 +107,17 @@ function fire(event: string) {
     }
 }
 
+const fixedTimeStep = 0.016;
 let acc = performance.now();
 function physics() {
     requestAnimationFrame(physics);
-    if (performance.now()-acc > 0.016) {
+    if (performance.now()-acc > 100) acc = performance.now() - 100;
+    while (performance.now()-acc > fixedTimeStep*1000) {
         fire("before");
-        world.step(0.016);
-        acc += 0.016;
+        reset();
+        world.step(fixedTimeStep);
+        acc += fixedTimeStep*1000;
     }
-    reset();
 }
 
 requestAnimationFrame(physics);

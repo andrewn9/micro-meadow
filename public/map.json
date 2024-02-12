@@ -1,0 +1,260 @@
+[
+    [
+        {
+            "type": "static",
+            "sprite": {
+                "source": "player.png",
+                "width": 600,
+                "height": 60
+            },
+            "position": {
+                "x": 0,
+                "y": -5
+            }
+        },
+        {
+            "shape": {
+                "style": {},
+                "appData": {},
+                "m_type": "polygon",
+                "m_radius": 0.01,
+                "m_centroid": {
+                    "x": 0,
+                    "y": 0
+                },
+                "m_vertices": [
+                    {
+                        "x": 15,
+                        "y": -1.5
+                    },
+                    {
+                        "x": 15,
+                        "y": 1.5
+                    },
+                    {
+                        "x": -15,
+                        "y": 1.5
+                    },
+                    {
+                        "x": -15,
+                        "y": -1.5
+                    }
+                ],
+                "m_normals": [
+                    {
+                        "x": 1,
+                        "y": 0
+                    },
+                    {
+                        "x": 0,
+                        "y": 1
+                    },
+                    {
+                        "x": -1,
+                        "y": 0
+                    },
+                    {
+                        "x": 0,
+                        "y": -1
+                    }
+                ],
+                "m_count": 4
+            },
+            "friction": 0.5
+        }
+    ],
+    [
+        {
+            "type": "static",
+            "sprite": {
+                "source": "player.png",
+                "width": 600,
+                "height": 60
+            },
+            "position": {
+                "x": 27,
+                "y": 2.5
+            },
+            "angle": 0.5235987755982988
+        },
+        {
+            "shape": {
+                "style": {},
+                "appData": {},
+                "m_type": "polygon",
+                "m_radius": 0.01,
+                "m_centroid": {
+                    "x": 0,
+                    "y": 0
+                },
+                "m_vertices": [
+                    {
+                        "x": 15,
+                        "y": -1.5
+                    },
+                    {
+                        "x": 15,
+                        "y": 1.5
+                    },
+                    {
+                        "x": -15,
+                        "y": 1.5
+                    },
+                    {
+                        "x": -15,
+                        "y": -1.5
+                    }
+                ],
+                "m_normals": [
+                    {
+                        "x": 1,
+                        "y": 0
+                    },
+                    {
+                        "x": 0,
+                        "y": 1
+                    },
+                    {
+                        "x": -1,
+                        "y": 0
+                    },
+                    {
+                        "x": 0,
+                        "y": -1
+                    }
+                ],
+                "m_count": 4
+            },
+            "friction": 0.5
+        }
+    ],
+    [
+        {
+            "type": "static",
+            "sprite": {
+                "source": "player.png",
+                "width": 200,
+                "height": 400
+            },
+            "position": {
+                "x": -15,
+                "y": 2.5
+            }
+        },
+        {
+            "shape": {
+                "style": {},
+                "appData": {},
+                "m_type": "polygon",
+                "m_radius": 0.01,
+                "m_centroid": {
+                    "x": 0,
+                    "y": 0
+                },
+                "m_vertices": [
+                    {
+                        "x": 5,
+                        "y": -10
+                    },
+                    {
+                        "x": 5,
+                        "y": 10
+                    },
+                    {
+                        "x": -5,
+                        "y": 10
+                    },
+                    {
+                        "x": -5,
+                        "y": -10
+                    }
+                ],
+                "m_normals": [
+                    {
+                        "x": 1,
+                        "y": 0
+                    },
+                    {
+                        "x": 0,
+                        "y": 1
+                    },
+                    {
+                        "x": -1,
+                        "y": 0
+                    },
+                    {
+                        "x": 0,
+                        "y": -1
+                    }
+                ],
+                "m_count": 4
+            },
+            "friction": 0.5
+        }
+    ],
+    [
+        {
+            "type": "dynamic",
+            "sprite": {
+                "source": "player.png",
+                "width": 40,
+                "height": 40
+            },
+            "position": {
+                "x": 0,
+                "y": 11
+            }
+        },
+        {
+            "shape": {
+                "style": {},
+                "appData": {},
+                "m_type": "polygon",
+                "m_radius": 0.01,
+                "m_centroid": {
+                    "x": 0,
+                    "y": 0
+                },
+                "m_vertices": [
+                    {
+                        "x": 1,
+                        "y": -1
+                    },
+                    {
+                        "x": 1,
+                        "y": 1
+                    },
+                    {
+                        "x": -1,
+                        "y": 1
+                    },
+                    {
+                        "x": -1,
+                        "y": -1
+                    }
+                ],
+                "m_normals": [
+                    {
+                        "x": 1,
+                        "y": 0
+                    },
+                    {
+                        "x": 0,
+                        "y": 1
+                    },
+                    {
+                        "x": -1,
+                        "y": 0
+                    },
+                    {
+                        "x": 0,
+                        "y": -1
+                    }
+                ],
+                "m_count": 4
+            },
+            "density": 2,
+            "friction": 0.5
+        }
+    ]
+]

@@ -27,7 +27,7 @@ export function getKeyPressed(key: string): boolean {
 }
 
 /**
- * Call at the end of a frame. Necesarry for getKeyPressed
+ * Call at the end of a frame. Necessary for getKeyPressed
  */
 export function reset() {
     for (const key in keys) {
